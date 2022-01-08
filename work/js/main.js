@@ -1,8 +1,6 @@
-'use strict'
-
 const mediaStreamConstraints = { video: true}
 const offerOptions = { offerToReceiveVideo: 1 }
-
+const STUNServers = null
 let localStream, remoteStream
 let localPeerConnection, remotePeerConnection
 
@@ -23,7 +21,7 @@ function handleLocalMediaStream(mediaStream) {
 }
 
 function handleRemoteMediaStream(event) {
-  const mediaStream = event.stream
+  const mediaStream = event.streams[0]
   remoteVideo.srcObject = mediaStream
   remoteStream = mediaStream
 }
@@ -38,7 +36,7 @@ function handleConnection(event) {
     const otherPeer = getOtherPeer(peerConnection)
 
     otherPeer.addIceCandidate(newIceCandidate)
-      .then(() => console.log('addIceCandidate success.'))
+      .then(() => console.log('ice candidate added successfully.'))
       .catch((err) => console.log(err))
   }
 }
@@ -94,18 +92,18 @@ function callAction() {
   callButton.disabled = true
   hangupButton.disabled = false
 
-  const servers = null // Allows for RTC server configuration.
-
   // Create peer connections and add behavior.
-  localPeerConnection = new RTCPeerConnection(servers)
-  localPeerConnection.addEventListener('icecandidate', handleConnection)
+  localPeerConnection = new RTCPeerConnection(STUNServers)
+  localPeerConnection.onicecandidate = handleConnection
 
-  remotePeerConnection = new RTCPeerConnection(servers)
-  remotePeerConnection.addEventListener('icecandidate', handleConnection)
-  remotePeerConnection.addEventListener('addstream', handleRemoteMediaStream)
+  remotePeerConnection = new RTCPeerConnection(STUNServers)
+  remotePeerConnection.onicecandidate = handleConnection
+  remotePeerConnection.ontrack = handleRemoteMediaStream
 
   // Add local stream to connection and create offer to connect.
-  localPeerConnection.addStream(localStream)
+  
+  console.log(localStream)
+  localStream.getTracks().forEach((track) => localPeerConnection.addTrack(track, localStream))
   localPeerConnection.createOffer(offerOptions).then(createdOffer).catch(err => console.log(err))
 }
 
