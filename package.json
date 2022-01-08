@@ -1,0 +1,24 @@
+{
+  "name": "webrtc-node",
+  "version": "1.0.0",
+  "description": "This code has the resources you need for the codelab [Realtime communication with WebRTC](https://codelabs.developers.google.com/codelabs/webrtc-web/#0).",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googlecodelabs/webrtc-web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/googlecodelabs/webrtc-web/issues"
+  },
+  "homepage": "https://github.com/googlecodelabs/webrtc-web#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
