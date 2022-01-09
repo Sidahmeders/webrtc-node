@@ -20,7 +20,19 @@ export function handleConnection(event) {
   }
 }
 
-// Gets the "other" peer connection.
+export function setDescriptionError(error) {
+  console.log(getPeerName(), 'set Description error:', error)
+}
+
+export function setDescriptionSuccess(peerConnection) {
+  console.log(getPeerName(peerConnection), 'set description success')
+}
+
+
 function getOtherPeer(peerConnection) {
   return (peerConnection === localPeerConnection) ? remotePeerConnection : localPeerConnection
+}
+
+function getPeerName(peerConnection) {
+  return (peerConnection === localPeerConnection) ? 'localPeerConnection' : 'remotePeerConnection'
 }

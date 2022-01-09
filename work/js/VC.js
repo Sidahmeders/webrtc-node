@@ -1,4 +1,4 @@
-import { handleConnection, handleConnectionChange } from './handlers.js'
+import { handleConnection, handleConnectionChange, setDescriptionSuccess, setDescriptionError } from './vc_handlers.js'
 
 const mediaStreamConstraints = { video: true}
 const offerOptions = { offerToReceiveVideo: 1 }
@@ -30,29 +30,24 @@ function handleRemoteMediaStream(event) {
 function createdOffer(description) {
   localPeerConnection
     .setLocalDescription(description)
-    .then(() => console.log('set local description success...'))
-    .catch(err => console.log(err))
+    .then(setDescriptionSuccess(localPeerConnection), setDescriptionError)
 
   remotePeerConnection
     .setRemoteDescription(description)
-    .then(() => console.log('set remote description success'))
-    .catch(err => console.log(err))
+    .then(setDescriptionSuccess(remotePeerConnection), setDescriptionError)
 
   remotePeerConnection
     .createAnswer()
-    .then(createdAnswer)
-    .catch(err => console.log(err))
+    .then(createdAnswer, err => console.log(err))
 }
 
 // Logs answer to offer creation and sets peer connection session descriptions.
 function createdAnswer(description) {
   remotePeerConnection.setLocalDescription(description)
-    .then(() => console.log('set local description success...'))
-    .catch(err => console.log(err))
+    .then(setDescriptionSuccess(remotePeerConnection), setDescriptionError)
 
   localPeerConnection.setRemoteDescription(description)
-    .then(() => console.log('set remote description success'))
-    .catch(err => console.log(err))
+    .then(setDescriptionSuccess(localPeerConnection), setDescriptionError)
 }
 
 // Set up initial action buttons status: disable call and hangup.
@@ -66,8 +61,7 @@ function startAction() {
 
   navigator.mediaDevices
     .getUserMedia(mediaStreamConstraints)
-    .then(handleLocalMediaStream)
-    .catch(err => console.log(err))
+    .then(handleLocalMediaStream, err => console.log(err))
 }
 
 // Handles call button action: creates peer connection.
@@ -86,7 +80,7 @@ function callAction() {
 
   // Add local stream to connection and create offer to connect.
   localStream.getTracks().forEach((track) => localPeerConnection.addTrack(track, localStream))
-  localPeerConnection.createOffer(offerOptions).then(createdOffer).catch(err => console.log(err))
+  localPeerConnection.createOffer(offerOptions).then(createdOffer, err => console.log(err))
 }
 
 // Handles hangup action: ends up call, closes connections and resets peers.
