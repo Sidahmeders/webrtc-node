@@ -1,3 +1,6 @@
+import { handleConnectionChange } from './handlers.js'
+
+
 const mediaStreamConstraints = { video: true}
 const offerOptions = { offerToReceiveVideo: 1 }
 const STUNServers = null
@@ -95,14 +98,13 @@ function callAction() {
   // Create peer connections and add behavior.
   localPeerConnection = new RTCPeerConnection(STUNServers)
   localPeerConnection.onicecandidate = handleConnection
+  localPeerConnection.oniceconnectionstatechange = handleConnectionChange
 
   remotePeerConnection = new RTCPeerConnection(STUNServers)
   remotePeerConnection.onicecandidate = handleConnection
   remotePeerConnection.ontrack = handleRemoteMediaStream
 
   // Add local stream to connection and create offer to connect.
-  
-  console.log(localStream)
   localStream.getTracks().forEach((track) => localPeerConnection.addTrack(track, localStream))
   localPeerConnection.createOffer(offerOptions).then(createdOffer).catch(err => console.log(err))
 }
