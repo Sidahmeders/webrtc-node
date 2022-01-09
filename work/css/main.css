@@ -6,3 +6,21 @@ video {
   max-width: 100%;
   width: 320px;
 }
+
+#VC {
+  border: 2px solid red;
+  margin: 20px 10px;
+}
+
+#DC {
+  border: 2px solid blue;
+  margin: 20px 10px;
+  text-align: center;
+}
+
+textarea {
+  display: inline-block;
+  min-height: 200px;
+  min-width: 200px;
+  margin: 15px 30px;
+}

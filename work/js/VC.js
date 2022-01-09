@@ -1,18 +1,15 @@
-import { handleConnectionChange } from './handlers.js'
-
+import { handleConnection, handleConnectionChange } from './handlers.js'
 
 const mediaStreamConstraints = { video: true}
 const offerOptions = { offerToReceiveVideo: 1 }
-const STUNServers = null
 let localStream, remoteStream
-let localPeerConnection, remotePeerConnection
 
 // Define peer connections, streams and video elements, and action buttons.
 const localVideo = document.getElementById('localVideo')
 const remoteVideo = document.getElementById('remoteVideo')
-const startButton = document.getElementById('startBtn')
-const callButton = document.getElementById('callBtn')
-const hangupButton = document.getElementById('hangupBtn')
+const startButton = document.getElementById('VC_startBtn')
+const callButton = document.getElementById('VC_callBtn')
+const hangupButton = document.getElementById('VC_hangupBtn')
 
 startButton.addEventListener('click', startAction)
 callButton.addEventListener('click', callAction)
@@ -29,24 +26,8 @@ function handleRemoteMediaStream(event) {
   remoteStream = mediaStream
 }
 
-// Connects with new peer candidate.
-function handleConnection(event) {
-  const peerConnection = event.target
-  const iceCandidate = event.candidate
-
-  if (iceCandidate) {
-    const newIceCandidate = new RTCIceCandidate(iceCandidate)
-    const otherPeer = getOtherPeer(peerConnection)
-
-    otherPeer.addIceCandidate(newIceCandidate)
-      .then(() => console.log('ice candidate added successfully.'))
-      .catch((err) => console.log(err))
-  }
-}
-
 // Logs offer creation and sets peer connection session descriptions.
 function createdOffer(description) {
-
   localPeerConnection
     .setLocalDescription(description)
     .then(() => console.log('set local description success...'))
@@ -77,7 +58,6 @@ function createdAnswer(description) {
 // Set up initial action buttons status: disable call and hangup.
 callButton.disabled = true
 hangupButton.disabled = true
-
 
 // Handles start button action: creates local MediaStream.
 function startAction() {
@@ -117,9 +97,4 @@ function hangupAction() {
   remotePeerConnection = null
   hangupButton.disabled = true
   callButton.disabled = false
-}
-
-// Gets the "other" peer connection.
-function getOtherPeer(peerConnection) {
-  return (peerConnection === localPeerConnection) ? remotePeerConnection : localPeerConnection
 }
