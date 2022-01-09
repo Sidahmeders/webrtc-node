@@ -1,4 +1,5 @@
-import { handleConnection, handleConnectionChange, setDescriptionSuccess, setDescriptionError } from './handlers.js'
+import { handleConnection, handleConnectionChange } from './handlers.js'
+import createdOffer from './createdOffer.js'
 
 let mediaStreamConstraints = { video: true }
 let offerOptions = { offerToReceiveVideo: 1 }
@@ -26,30 +27,6 @@ function handleRemoteMediaStream(event) {
   remoteStream = mediaStream
 }
 
-// Logs offer creation and sets peer connection session descriptions.
-function createdOffer(description) {
-  localPeerConnection
-    .setLocalDescription(description)
-    .then(setDescriptionSuccess(localPeerConnection), setDescriptionError)
-
-  remotePeerConnection
-    .setRemoteDescription(description)
-    .then(setDescriptionSuccess(remotePeerConnection), setDescriptionError)
-
-  remotePeerConnection
-    .createAnswer()
-    .then(createdAnswer, err => console.log(err))
-}
-
-// Logs answer to offer creation and sets peer connection session descriptions.
-function createdAnswer(description) {
-  remotePeerConnection.setLocalDescription(description)
-    .then(setDescriptionSuccess(remotePeerConnection), setDescriptionError)
-
-  localPeerConnection.setRemoteDescription(description)
-    .then(setDescriptionSuccess(localPeerConnection), setDescriptionError)
-}
-
 // Set up initial action buttons status: disable call and hangup.
 callButton.disabled = true
 hangupButton.disabled = true
@@ -61,7 +38,7 @@ function startAction() {
 
   navigator.mediaDevices
     .getUserMedia(mediaStreamConstraints)
-    .then(handleLocalMediaStream, err => console.log(err))
+    .then(handleLocalMediaStream)
 }
 
 // Handles call button action: creates peer connection.
@@ -80,7 +57,7 @@ function callAction() {
 
   // Add local stream to connection and create offer to connect.
   localStream.getTracks().forEach((track) => localPeerConnection.addTrack(track, localStream))
-  localPeerConnection.createOffer(offerOptions).then(createdOffer, err => console.log(err))
+  localPeerConnection.createOffer(offerOptions).then(createdOffer)
 }
 
 // Handles hangup action: ends up call, closes connections and resets peers.

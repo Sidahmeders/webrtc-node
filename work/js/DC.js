@@ -1,5 +1,5 @@
-import { onCreateSessionDescriptionError } from './handlers.js'
-import { handleConnection } from './handlers.js'
+import { handleConnection, setDescriptionError } from './handlers.js'
+import createdOffer from './createdOffer.js'
 
 let sendChannel, receiveChannel
 let pcConstraint = null, dataConstraint = null
@@ -28,7 +28,7 @@ function createConnection() {
   remotePeerConnection.onicecandidate = handleConnection
   remotePeerConnection.ondatachannel = receiveChannelCallback
 
-  localPeerConnection.createOffer().then(gotDescription1, onCreateSessionDescriptionError)
+  localPeerConnection.createOffer().then(createdOffer)
   startButton.disabled = true
   closeButton.disabled = false
 }
@@ -36,36 +36,6 @@ function createConnection() {
 function sendData() {
   let data = dataChannelSend.value
   sendChannel.send(data)
-}
-
-function closeDataChannels() {
-  sendChannel.close()
-  receiveChannel.close()
-  
-  localPeerConnection.close()
-  remotePeerConnection.close()
-  localPeerConnection = null
-  remotePeerConnection = null
-
-  startButton.disabled = false
-  sendButton.disabled = true
-  closeButton.disabled = true
-  dataChannelSend.value = ''
-  dataChannelReceive.value = ''
-  dataChannelSend.disabled = true
-  sendButton.disabled = true
-  startButton.disabled = false
-}
-
-function gotDescription1(desc) {
-  localPeerConnection.setLocalDescription(desc)
-  remotePeerConnection.setRemoteDescription(desc)
-  remotePeerConnection.createAnswer().then(gotDescription2, onCreateSessionDescriptionError)
-}
-
-function gotDescription2(desc) {
-  remotePeerConnection.setLocalDescription(desc)
-  localPeerConnection.setRemoteDescription(desc)
 }
 
 function receiveChannelCallback(event) {
@@ -96,4 +66,23 @@ function onSendChannelStateChange() {
 function onReceiveChannelStateChange() {
   let readyState = receiveChannel.readyState
   console.log('Receive channel state is: ' + readyState)
+}
+
+function closeDataChannels() {
+  sendChannel.close()
+  receiveChannel.close()
+  
+  localPeerConnection.close()
+  remotePeerConnection.close()
+  localPeerConnection = null
+  remotePeerConnection = null
+
+  startButton.disabled = false
+  sendButton.disabled = true
+  closeButton.disabled = true
+  dataChannelSend.value = ''
+  dataChannelReceive.value = ''
+  dataChannelSend.disabled = true
+  sendButton.disabled = true
+  startButton.disabled = false
 }

@@ -17,23 +17,11 @@ export function handleConnection(event) {
 }
 
 export function setDescriptionError(error) {
-  console.log(getPeerName(), 'set Description error:', error)
+  console.log(getPeerName(), 'Failed to create session description: ', error)
 }
 
 export function setDescriptionSuccess(peerConnection) {
   console.log(getPeerName(peerConnection), 'set description success')
-}
-
-export function onCreateSessionDescriptionError(error) { // THIS IS DC ONLY
-  console.log('Failed to create session description: ' + error.toString())
-}
-
-function getOtherPeer(peerConnection) {
-  return (peerConnection === localPeerConnection) ? remotePeerConnection : localPeerConnection
-}
-
-function getPeerName(peerConnection) {
-  return (peerConnection === localPeerConnection) ? 'localPeerConnection' : 'remotePeerConnection'
 }
 
 function onAddIceCandidateSuccess() {
@@ -42,4 +30,12 @@ function onAddIceCandidateSuccess() {
 
 function onAddIceCandidateError(error) {
   console.log('Failed to add Ice Candidate: ' + error.toString())
+}
+
+function getOtherPeer(peerConnection) {
+  return (peerConnection === localPeerConnection) ? remotePeerConnection : localPeerConnection
+}
+
+function getPeerName(peerConnection) {
+  return (peerConnection === localPeerConnection) ? 'localPeerConnection' : 'remotePeerConnection'
 }
