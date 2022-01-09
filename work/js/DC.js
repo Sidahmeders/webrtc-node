@@ -1,17 +1,13 @@
 import { onAddIceCandidateError, onCreateSessionDescriptionError, onAddIceCandidateSuccess } from './dc_handlers.js'
 
-var localConnection
-var remoteConnection
-var sendChannel
-var receiveChannel
-var pcConstraint
-var dataConstraint
+let sendChannel, receiveChannel
+let pcConstraint = null, dataConstraint = null
 
-var dataChannelSend = document.querySelector('textarea#dataChannelSend')
-var dataChannelReceive = document.querySelector('textarea#dataChannelReceive')
-var startButton = document.getElementById('DC_startBtn')
-var sendButton = document.getElementById('DC_sendBtn')
-var closeButton = document.getElementById('DC_closeBtn')
+let startButton = document.getElementById('DC_startBtn')
+let sendButton = document.getElementById('DC_sendBtn')
+let closeButton = document.getElementById('DC_closeBtn')
+let dataChannelSend = document.querySelector('textarea#dataChannelSend')
+let dataChannelReceive = document.querySelector('textarea#dataChannelReceive')
 
 startButton.onclick = createConnection
 sendButton.onclick = sendData
@@ -19,21 +15,19 @@ closeButton.onclick = closeDataChannels
 
 function createConnection() {
   dataChannelSend.placeholder = ''
-  pcConstraint = null
-  dataConstraint = null
   
-  window.localConnection = localConnection = new RTCPeerConnection(STUNServers, pcConstraint)
-  sendChannel = localConnection.createDataChannel('sendDataChannel', dataConstraint)
+  localPeerConnection = new RTCPeerConnection(STUNServers, pcConstraint)
+  sendChannel = localPeerConnection.createDataChannel('sendDataChannel', dataConstraint)
 
-  localConnection.onicecandidate = iceCallback1
+  localPeerConnection.onicecandidate = iceCallback1
   sendChannel.onopen = onSendChannelStateChange
   sendChannel.onclose = onSendChannelStateChange
 
-  window.remoteConnection = remoteConnection = new RTCPeerConnection(STUNServers, pcConstraint)
-  remoteConnection.onicecandidate = iceCallback2
-  remoteConnection.ondatachannel = receiveChannelCallback
+  remotePeerConnection = new RTCPeerConnection(STUNServers, pcConstraint)
+  remotePeerConnection.onicecandidate = iceCallback2
+  remotePeerConnection.ondatachannel = receiveChannelCallback
 
-  localConnection.createOffer().then(gotDescription1, onCreateSessionDescriptionError)
+  localPeerConnection.createOffer().then(gotDescription1, onCreateSessionDescriptionError)
   startButton.disabled = true
   closeButton.disabled = false
 }
@@ -47,10 +41,10 @@ function closeDataChannels() {
   sendChannel.close()
   receiveChannel.close()
   
-  localConnection.close()
-  remoteConnection.close()
-  localConnection = null
-  remoteConnection = null
+  localPeerConnection.close()
+  remotePeerConnection.close()
+  localPeerConnection = null
+  remotePeerConnection = null
 
   startButton.disabled = false
   sendButton.disabled = true
@@ -63,26 +57,26 @@ function closeDataChannels() {
 }
 
 function gotDescription1(desc) {
-  localConnection.setLocalDescription(desc)
-  remoteConnection.setRemoteDescription(desc)
-  remoteConnection.createAnswer().then(gotDescription2, onCreateSessionDescriptionError)
+  localPeerConnection.setLocalDescription(desc)
+  remotePeerConnection.setRemoteDescription(desc)
+  remotePeerConnection.createAnswer().then(gotDescription2, onCreateSessionDescriptionError)
 }
 
 function gotDescription2(desc) {
-  remoteConnection.setLocalDescription(desc)
-  localConnection.setRemoteDescription(desc)
+  remotePeerConnection.setLocalDescription(desc)
+  localPeerConnection.setRemoteDescription(desc)
 }
 
 function iceCallback1(event) {
   if (event.candidate) {
-    remoteConnection.addIceCandidate(event.candidate)
+    remotePeerConnection.addIceCandidate(event.candidate)
     .then(onAddIceCandidateSuccess, onAddIceCandidateError)
   }
 }
 
 function iceCallback2(event) {
   if (event.candidate) {
-    localConnection.addIceCandidate(event.candidate)
+    localPeerConnection.addIceCandidate(event.candidate)
     .then(onAddIceCandidateSuccess, onAddIceCandidateError)
   }
 }

@@ -1,7 +1,7 @@
 import { handleConnection, handleConnectionChange, setDescriptionSuccess, setDescriptionError } from './vc_handlers.js'
 
-const mediaStreamConstraints = { video: true}
-const offerOptions = { offerToReceiveVideo: 1 }
+let mediaStreamConstraints = { video: true }
+let offerOptions = { offerToReceiveVideo: 1 }
 let localStream, remoteStream
 
 // Define peer connections, streams and video elements, and action buttons.
@@ -11,9 +11,9 @@ const startButton = document.getElementById('VC_startBtn')
 const callButton = document.getElementById('VC_callBtn')
 const hangupButton = document.getElementById('VC_hangupBtn')
 
-startButton.addEventListener('click', startAction)
-callButton.addEventListener('click', callAction)
-hangupButton.addEventListener('click', hangupAction)
+startButton.onclick = startAction
+callButton.onclick = callAction
+hangupButton.onclick = hangupAction
 
 function handleLocalMediaStream(mediaStream) {
   localVideo.srcObject = mediaStream
