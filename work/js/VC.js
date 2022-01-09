@@ -1,4 +1,4 @@
-import { handleConnection, handleConnectionChange, setDescriptionSuccess, setDescriptionError } from './vc_handlers.js'
+import { handleConnection, handleConnectionChange, setDescriptionSuccess, setDescriptionError } from './handlers.js'
 
 let mediaStreamConstraints = { video: true }
 let offerOptions = { offerToReceiveVideo: 1 }
