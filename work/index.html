@@ -8,9 +8,10 @@
   <h1>Realtime communication with WebRTC</h1>
 
   <section id="VC">
+    <h2>local signaling</h2>
     <div class="videos">
-      <video id="localVideo" autoplay playsinline></video>
-      <video id="remoteVideo" autoplay playsinline></video>
+      <video id="vc_localVideo" autoplay playsinline></video>
+      <video id="vc_remoteVideo" autoplay playsinline></video>
     </div>
     
     <div id="video-call-buttons">
@@ -31,6 +32,15 @@
     </div>
   </section>
 
+  <section>
+    <h2>WebSockets signaling</h2>
+    <div class="videos">
+      <video id="localVideo" autoplay playsinline></video>
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+    
+  </section>
+  
   <!-- External Libraries -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>

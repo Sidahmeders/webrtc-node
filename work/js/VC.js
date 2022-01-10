@@ -4,6 +4,8 @@ import createdOffer from './createdOffer.js'
 let mediaStreamConstraints = { video: true }
 let offerOptions = { offerToReceiveVideo: 1 }
 
+const vc_localVideo = document.getElementById('vc_localVideo')
+const vc_remoteVideo = document.getElementById('vc_remoteVideo')
 const startButton = document.getElementById('VC_startBtn')
 const callButton = document.getElementById('VC_callBtn')
 const hangupButton = document.getElementById('VC_hangupBtn')
@@ -13,13 +15,13 @@ callButton.onclick = callAction
 hangupButton.onclick = hangupAction
 
 function handleLocalMediaStream(mediaStream) {
-  localVideo.srcObject = mediaStream
+  vc_localVideo.srcObject = mediaStream
   localStream = mediaStream
 }
 
 function handleRemoteMediaStream(event) {
   const mediaStream = event.streams[0]
-  remoteVideo.srcObject = mediaStream
+  vc_remoteVideo.srcObject = mediaStream
   remoteStream = mediaStream
 }
 
