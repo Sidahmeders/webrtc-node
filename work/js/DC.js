@@ -1,4 +1,4 @@
-import { handleConnection, setDescriptionError } from './handlers.js'
+import { handleConnection } from './handlers.js'
 import createdOffer from './createdOffer.js'
 
 let sendChannel, receiveChannel

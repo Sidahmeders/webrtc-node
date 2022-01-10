@@ -3,11 +3,7 @@ import createdOffer from './createdOffer.js'
 
 let mediaStreamConstraints = { video: true }
 let offerOptions = { offerToReceiveVideo: 1 }
-let localStream, remoteStream
 
-// Define peer connections, streams and video elements, and action buttons.
-const localVideo = document.getElementById('localVideo')
-const remoteVideo = document.getElementById('remoteVideo')
 const startButton = document.getElementById('VC_startBtn')
 const callButton = document.getElementById('VC_callBtn')
 const hangupButton = document.getElementById('VC_hangupBtn')
