@@ -1,12 +1,22 @@
 import path from 'path'
 import express from 'express'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+
+import webrtcSignaling from './events/webrtcSignaling.js'
+
 
 const app = express()
-const __dirname = path.resolve()
+const server = createServer(app)
+const io = new Server(server)
 
-app.use(express.static(path.join(__dirname, '/work')))
+app.use(express.static(path.join(path.resolve(), '/work')))
 
 app.get('/', (_, res) => res.render('index'))
 
 const PORT = process.env.PORT || 5000
-app.listen(PORT, () => console.log(`app server running on port ${PORT}...`))
+server.listen(PORT, () => console.log(`app server running on port ${PORT}...`))
+
+io.sockets.on('connection', (socket) => {
+  webrtcSignaling({ socket, io })
+})
