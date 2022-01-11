@@ -11,7 +11,7 @@ var room = prompt("Enter room name:")
 var isChannelReady = false
 var isInitiator = false
 var isStarted = false
-var pc
+var peerConnection
 var turnReady
 
 var pcConfig = {

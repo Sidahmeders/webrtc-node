@@ -17,7 +17,6 @@ export default function handleWebRtcSignaling({ socket, io }) {
       io.sockets.in(room).emit('join', room)
       socket.join(room)
       socket.emit('joined', room, socket.id)
-      io.sockets.in(room).emit('ready')
     } else { // max two clients
       socket.emit('full', room)
     }
