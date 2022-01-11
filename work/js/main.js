@@ -40,7 +40,6 @@ socket.on('message', (message) => {
     })
     peerConnection.addIceCandidate(candidate)
   }
-  else if (message === 'bye' && isStarted) handleRemoteHangup()
 })
 
 navigator.mediaDevices.getUserMedia({ audio: false, video: true }).then(gotStream)
@@ -62,8 +61,6 @@ function maybeStart() {
     if (isInitiator) doCall()
   }
 }
-
-window.onbeforeunload = () => sendMessage('bye')
 
 function createPeerConnection() {
   try {
@@ -89,16 +86,12 @@ function handleIceCandidate(event) {
   }
 }
 
-function handleCreateOfferError(event) {
-  console.log('createOffer() error: ', event)
-}
-
 function doCall() {
-  peerConnection.createOffer(setLocalAndSendMessage, handleCreateOfferError)
+  peerConnection.createOffer(setLocalAndSendMessage, err => alert(err.message))
 }
 
 function doAnswer() {
-  peerConnection.createAnswer().then(setLocalAndSendMessage)
+  peerConnection.createAnswer().then(setLocalAndSendMessage, err => alert(err.message))
 }
 
 function setLocalAndSendMessage(sessionDescription) {
@@ -109,21 +102,4 @@ function setLocalAndSendMessage(sessionDescription) {
 function handleRemoteTrackAdded(event) {
   remoteStream = event.streams[0]
   remoteVideo.srcObject = remoteStream
-}
-
-// Hangups. Close peer connections
-function hangup() {
-  stop()
-  sendMessage('bye')
-}
-
-function handleRemoteHangup() {
-  stop()
-  isInitiator = false
-}
-
-function stop() {
-  isStarted = false
-  peerConnection.close()
-  peerConnection = null
 }
