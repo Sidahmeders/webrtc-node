@@ -1,11 +1,9 @@
 import os from 'os'
 
 export default function handleWebRtcSignaling({ socket, io }) {
-  socket.on('message', (message) => {
+  socket.on('message', (payload) => {
     // for a real app, would be room-only (not broadcast)
-    const { eventType, payload } = message    
-    let event = payload?.type ? payload.type : eventType
-
+    const event = payload?.type ? payload.type : 'candidate'
     socket.broadcast.emit(event, payload)
   })
 

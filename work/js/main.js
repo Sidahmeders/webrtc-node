@@ -10,8 +10,8 @@ socket.on('joined', () => isChannelReady = true)
 
 socket.on('full', (room) => console.log('Room ' + room + ' is full'))
 
-function sendMessage({ eventType, payload }) {
-  socket.emit('message', { eventType, payload })
+function sendMessage(payload) {
+  socket.emit('message', payload)
 }
 
 socket.on('user-media', () => maybeStart())
@@ -41,7 +41,7 @@ navigator.mediaDevices.getUserMedia({ audio: false, video: true }).then(handleLo
 function handleLocalMediaStream(stream) {
   localStream = stream
   localVideo.srcObject = stream
-  sendMessage({ eventType: 'user-media' })
+  sendMessage({ type: 'user-media' })
   if (isInitiator) maybeStart()
 }
 
@@ -68,8 +68,8 @@ function createPeerConnection() {
 }
 
 function handleIceCandidate(event) {
-  const offerCandidate = event.candidate
-  if (offerCandidate) sendMessage({ eventType: 'candidate', payload: offerCandidate })
+  const offerCandidates = event.candidate
+  if (offerCandidates) sendMessage(offerCandidates)
   else console.log('End of candidates.')
 }
 
@@ -83,7 +83,7 @@ function doAnswer() {
 
 function setLocalAndSendMessage(sessionDescription) {
   peerConnection.setLocalDescription(sessionDescription)
-  sendMessage({ payload: sessionDescription })
+  sendMessage(sessionDescription)
 }
 
 function handleRemoteTrackAdded(event) {
