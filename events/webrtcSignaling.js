@@ -3,10 +3,13 @@ import os from 'os'
 export default function handleWebRtcSignaling({ socket, io }) {
   socket.on('message', (message) => {
     // for a real app, would be room-only (not broadcast)
-    socket.broadcast.emit('message', message)
+    const { eventType, payload } = message    
+    let event = payload?.type ? payload.type : eventType
+
+    socket.broadcast.emit(event, payload)
   })
 
-  socket.on('create or join', (room) => {
+  socket.on('create-join', (room) => {
     const clientsInRoom = socket.adapter.rooms.get(room)
     const numClients = clientsInRoom ? clientsInRoom.size : 0
 
