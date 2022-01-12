@@ -1,5 +1,6 @@
 var localPeerConnection 
 var remotePeerConnection
+
 var localStream
 var remoteStream
 var localVideo = document.getElementById('localVideo')

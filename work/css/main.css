@@ -2,11 +2,6 @@ body {
   font-family: sans-serif;
 }
 
-#VC {
-  border: 2px solid red;
-  margin: 20px 10px;
-}
-
 .videos {
   display: flex;
   justify-content: space-evenly;
