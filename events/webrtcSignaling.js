@@ -13,7 +13,7 @@ export default function handleWebRtcSignaling({ socket, io }) {
     if (numClients === 0) {
       socket.join(room)
       socket.emit('created', room, socket.id)
-    } else if (numClients === 1) {
+    } else if (numClients < 3) {
       io.sockets.in(room).emit('join', room)
       socket.join(room)
       socket.emit('joined', room, socket.id)

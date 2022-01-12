@@ -1,19 +1,19 @@
 var localPeerConnection 
 var remotePeerConnection
 
-var localStream
-var remoteStream
-var localVideo = document.getElementById('localVideo')
-var remoteVideo = document.getElementById('remoteVideo')
-var STUNServers = null
-var socket = io()
-var room = prompt("Enter room name:")
-
+var peerConnection
 var isChannelReady = false
 var isInitiator = false
 var isStarted = false
-var peerConnection
 var turnReady
+
+var localStream
+var localVideo = document.getElementById('localVideo')
+var remoteVideo = document.getElementById('remoteVideo')
+
+var STUNServers = null
+var socket = io()
+var room = prompt("Enter room name:")
 
 var pcConfig = {
   iceServers: [{

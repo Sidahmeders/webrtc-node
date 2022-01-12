@@ -90,10 +90,8 @@ function createPeerConnection() {
 function handleIceCandidate(event) {
   const offerCandidates = event.candidate
   if (offerCandidates) sendMessage(offerCandidates)
-  else console.log('End of candidates.')
 }
 
 function handleRemoteTrackAdded(event) {
-  remoteStream = event.streams[0]
-  remoteVideo.srcObject = remoteStream
+  remoteVideo.srcObject = event.streams[0]
 }

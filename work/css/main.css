@@ -2,7 +2,13 @@ body {
   font-family: sans-serif;
 }
 
-.videos {
+#VC {
+  border: 2px solid green;
+  margin: 20px 10px;
+  text-align: center; 
+}
+
+#videos {
   display: flex;
   justify-content: space-evenly;
   margin: 10px;
@@ -24,10 +30,4 @@ textarea {
   min-height: 200px;
   min-width: 200px;
   margin: 15px 30px;
-}
-
-#WS-VC {
-  border: 2px solid green;
-  margin: 20px 10px;
-  text-align: center; 
 }
