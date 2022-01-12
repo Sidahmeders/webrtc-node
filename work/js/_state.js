@@ -25,8 +25,3 @@ var pcConfig = {
   }],
   iceCandidatePoolSize: 10
 }
-
-var sdpConstraints = {
-  offerToReceiveAudio: true,
-  offerToReceiveVideo: true
-}

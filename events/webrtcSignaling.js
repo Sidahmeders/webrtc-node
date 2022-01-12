@@ -1,10 +1,9 @@
 import os from 'os'
 
 export default function handleWebRtcSignaling({ socket, io }) {
-  socket.on('message', (payload) => {
-    // for a real app, would be room-only (not broadcast)
+  socket.on('message', (room, payload) => {
     const event = payload?.type ? payload.type : 'candidate'
-    socket.broadcast.emit(event, payload)
+    socket.to(room).emit(event, payload) //sending to sender client, only if they are in 'game' room(channel)
   })
 
   socket.on('create-join', (room) => {

@@ -29,7 +29,7 @@ function getOtherPeer(peerConnection) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function sendMessage(payload) {
-  socket.emit('message', payload)
+  socket.emit('message', room, payload)
 }
 
 export function onOffer(payload) {
@@ -47,10 +47,7 @@ export function onAnswer(payload) {
 
 export function onCandidate(payload) {
   if (isStarted) {
-    let candidate = new RTCIceCandidate({
-      sdpMLineIndex: payload.sdpMLineIndex,
-      candidate: payload.candidate
-    })
+    let candidate = new RTCIceCandidate(payload)
     peerConnection.addIceCandidate(candidate)
   }
 }
