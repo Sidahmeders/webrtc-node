@@ -1,5 +1,4 @@
-import { handleConnection } from './handlers.js'
-import createdOffer from './createdOffer.js'
+import { handleConnection, createdOffer } from './dc_handlers.js'
 
 let sendChannel, receiveChannel
 let pcConstraint = null, dataConstraint = null

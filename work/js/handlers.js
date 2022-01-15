@@ -1,32 +1,3 @@
-// Connects with new peer candidate.
-export function handleConnection(event) {
-  const peerConnection = event.target
-  const iceCandidate = event.candidate
-  if (iceCandidate) {
-    const newIceCandidate = new RTCIceCandidate(iceCandidate)
-    const otherPeer = getOtherPeer(peerConnection)
-    otherPeer.addIceCandidate(newIceCandidate).then(onAddIceCandidateSuccess, onAddIceCandidateError)
-  }
-}
-
-function onAddIceCandidateSuccess() {
-  console.log('AddIceCandidate success.')
-}
-
-function onAddIceCandidateError(error) {
-  console.log('Failed to add Ice Candidate: ' + error.toString())
-}
-
-function getOtherPeer(peerConnection) {
-  return (peerConnection === localPeerConnection) ? remotePeerConnection : localPeerConnection
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function sendMessage(payload) {
   socket.emit('message', room, payload)
@@ -35,10 +6,7 @@ function sendMessage(payload) {
 export function onOffer(payload) {
   if (!isInitiator && !isStarted) maybeStart()
   peerConnection.setRemoteDescription(new RTCSessionDescription(payload))
-  doAnswer()
-}
-function doAnswer() {
-  peerConnection.createAnswer().then(setLocalAndSendMessage, err => alert(err.message))
+  peerConnection.createAnswer().then(setLocalAndSendMessage)
 }
 
 export function onAnswer(payload) {
@@ -64,11 +32,8 @@ export function maybeStart() {
     createPeerConnection()
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream))
     isStarted = true
-    if (isInitiator) doCall()
+    if (isInitiator) peerConnection.createOffer().then(setLocalAndSendMessage)
   }
-}
-function doCall() {
-  peerConnection.createOffer(setLocalAndSendMessage, err => alert(err.message))
 }
 
 function setLocalAndSendMessage(sessionDescription) {
@@ -77,21 +42,12 @@ function setLocalAndSendMessage(sessionDescription) {
 }
 
 function createPeerConnection() {
-  try {
-    peerConnection = new RTCPeerConnection(null)
-    peerConnection.onicecandidate = handleIceCandidate
-    peerConnection.ontrack = handleRemoteTrackAdded
-  } catch (err) {
-    alert('Cannot create RTCPeerConnection object: ', err.message)
-    return
-  }
+  peerConnection = new RTCPeerConnection(null)
+  peerConnection.onicecandidate = handleIceCandidate
+  peerConnection.ontrack = event =>  remoteVideo.srcObject = event.streams[0]
 }
 
 function handleIceCandidate(event) {
   const offerCandidates = event.candidate
   if (offerCandidates) sendMessage(offerCandidates)
-}
-
-function handleRemoteTrackAdded(event) {
-  remoteVideo.srcObject = event.streams[0]
 }
