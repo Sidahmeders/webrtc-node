@@ -1,21 +1,19 @@
 var localPeerConnection 
 var remotePeerConnection
 
-var peerConnection
-var isChannelReady = false
-var isInitiator = false
-var isStarted = false
-var turnReady
-
+var peersMap = {}
+var localUuid
 var localStream
 var localVideo = document.getElementById('localVideo')
 var remoteVideo = document.getElementById('remoteVideo')
 
+var turnReady
 var STUNServers = null
 var socket = io()
 var room = prompt("Enter room name:")
 
-var pcConfig = {
+var mediaConstraint = { audio: false, video: true }
+var peerConfig = {
   iceServers: [{
     urls: [
       'stun:stun.l.google.com:19302',

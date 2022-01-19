@@ -1,53 +1,34 @@
 
 function sendMessage(payload) {
-  socket.emit('message', room, payload)
+  const message = JSON.stringify({ room, payload })
+  socket.emit('message', message)
 }
 
-export function onOffer(payload) {
-  if (!isInitiator && !isStarted) maybeStart()
-  peerConnection.setRemoteDescription(new RTCSessionDescription(payload))
-  peerConnection.createAnswer().then(setLocalAndSendMessage)
+export async function userJoinedHandler(payload) {
+  const { socketID, numClients } = JSON.parse(payload)
+  localUuid = socketID
+  localStream = await navigator.mediaDevices.getUserMedia(mediaConstraint)
+  localVideo.srcObject = localStream
+  peersMap[localUuid] = { id: localUuid, pc: new RTCPeerConnection(peerConfig) }
+  if (numClients) sendMessage({ type: 'call' })
 }
 
-export function onAnswer(payload) {
-  if (isStarted) peerConnection.setRemoteDescription(new RTCSessionDescription(payload))
+
+export async function setupPeer() {
+  const offerDescription = await peersMap[localUuid].pc.createOffer()
+  await peersMap[localUuid].pc.setLocalDescription(new RTCSessionDescription(offerDescription))
+
+  sendMessage(offerDescription)
 }
 
-export function onCandidate(payload) {
-  if (isStarted) {
-    let candidate = new RTCIceCandidate(payload)
-    peerConnection.addIceCandidate(candidate)
-  }
+export async function onOffer(payload) {
+  await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(payload))
+  const answerDescription = await peersMap[localUuid].pc.createAnswer()
+  await peersMap[localUuid].pc.setLocalDescription(new RTCSessionDescription(answerDescription))
+
+  sendMessage(answerDescription)
 }
 
-export function onLocalMediaStream(stream) {
-  localStream = stream
-  localVideo.srcObject = stream
-  sendMessage({ type: 'user-media' })
-  if (isInitiator) maybeStart()
-}
-
-export function maybeStart() {
-  if (!isStarted && typeof localStream !== undefined && isChannelReady) {
-    createPeerConnection()
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream))
-    isStarted = true
-    if (isInitiator) peerConnection.createOffer().then(setLocalAndSendMessage)
-  }
-}
-
-function setLocalAndSendMessage(sessionDescription) {
-  peerConnection.setLocalDescription(sessionDescription)
-  sendMessage(sessionDescription)
-}
-
-function createPeerConnection() {
-  peerConnection = new RTCPeerConnection(null)
-  peerConnection.onicecandidate = handleIceCandidate
-  peerConnection.ontrack = event =>  remoteVideo.srcObject = event.streams[0]
-}
-
-function handleIceCandidate(event) {
-  const offerCandidates = event.candidate
-  if (offerCandidates) sendMessage(offerCandidates)
+export async function onAnswer(payload) {
+  await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(payload))
 }
