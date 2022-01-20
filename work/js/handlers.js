@@ -1,3 +1,4 @@
+import { onRemoteMediaStream } from "./utils.js"
 
 function sendMessage(payload) {
   const message = JSON.stringify({ room, payload })
@@ -9,10 +10,13 @@ export async function userJoinedHandler(payload) {
   localUuid = socketID
   localStream = await navigator.mediaDevices.getUserMedia(mediaConstraint)
   localVideo.srcObject = localStream
+
   peersMap[localUuid] = { id: localUuid, pc: new RTCPeerConnection(peerConfig) }
+  peersMap[localUuid].pc.ontrack = event => onRemoteMediaStream(event, undefined)
+  localStream.getTracks().forEach(track => peersMap[localUuid].pc.addTrack(track, localStream))
+
   if (numClients) sendMessage({ type: 'call' })
 }
-
 
 export async function setupPeer() {
   const offerDescription = await peersMap[localUuid].pc.createOffer()
