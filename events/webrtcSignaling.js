@@ -2,7 +2,8 @@
 export default function handleWebRtcSignaling({ socket, io }) {
   socket.on('message', (message) => {
     const { room, payload } = JSON.parse(message)
-    const event = payload?.type ? payload.type : 'candidate'
+    const event = payload?.type
+    console.log(event, "+++++++")
     socket.to(room).emit(event, payload)
   })
 

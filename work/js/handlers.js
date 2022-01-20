@@ -5,29 +5,33 @@ function sendMessage(payload) {
   socket.emit('message', message)
 }
 
-export async function userJoinedHandler(payload) {
+function setupPeer(peerUuid) {
+  peersMap[peerUuid] = { id: peerUuid, pc: new RTCPeerConnection(peerConfig) }
+  peersMap[peerUuid].pc.onicecandidate = event => event.candidate ? sendMessage({ type: 'candidate', peerUuid: localUuid, candidate: event.candidate }) : null
+  peersMap[peerUuid].pc.ontrack = event => onRemoteMediaStream(event, peerUuid)
+  localStream.getTracks().forEach(track => peersMap[peerUuid].pc.addTrack(track, localStream))
+}
+
+export async function onJoined(payload) {
   try {
     const { socketID, numClients } = JSON.parse(payload)
     localUuid = socketID
     localStream = await navigator.mediaDevices.getUserMedia(mediaConstraint)
     localVideo.srcObject = localStream
-    
-    peersMap[localUuid] = { id: localUuid, pc: new RTCPeerConnection(peerConfig) }
-    peersMap[localUuid].pc.onicecandidate = event => event.candidate ? sendMessage(event.candidate) : null
-    peersMap[localUuid].pc.ontrack = event => onRemoteMediaStream(event, undefined)
-    localStream.getTracks().forEach(track => peersMap[localUuid].pc.addTrack(track, localStream))
-    
-    if (numClients) sendMessage({ type: 'call' })
+
+    if (numClients) sendMessage({ type: 'call', peerUuid: localUuid })
   } catch(err) {
     console.log(err.message)
   }
 }
 
-export async function setupPeer() {
+export async function onCall(payload) {
   try {
+    setupPeer(localUuid)
     const offerDescription = await peersMap[localUuid].pc.createOffer()
     await peersMap[localUuid].pc.setLocalDescription(new RTCSessionDescription(offerDescription)) 
-    sendMessage(offerDescription)
+    
+    sendMessage({ type: 'offer', peerUuid: localUuid, description: offerDescription })
   } catch(err) {
     console.log(err.message)
   }
@@ -35,10 +39,13 @@ export async function setupPeer() {
 
 export async function onOffer(payload) {
   try {
-    await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(payload))
+    const { description } = payload
+    setupPeer(localUuid)
+    await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
     const answerDescription = await peersMap[localUuid].pc.createAnswer()
     await peersMap[localUuid].pc.setLocalDescription(new RTCSessionDescription(answerDescription))
-    sendMessage(answerDescription)
+
+    sendMessage({ type: 'answer', peerUuid: localUuid, description: answerDescription })
   } catch (err) {
     console.log(err.message)
   }
@@ -46,7 +53,8 @@ export async function onOffer(payload) {
 
 export async function onAnswer(payload) {
   try {
-    await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(payload))
+    const { description } = payload
+    await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
   } catch(err) {
     console.log(err.message)
   }
@@ -54,7 +62,8 @@ export async function onAnswer(payload) {
 
 export async function onCandidate(payload) {
   try {
-    await peersMap[localUuid].pc.addIceCandidate(new RTCIceCandidate(payload))
+    const { candidate } = payload
+    await peersMap[localUuid].pc.addIceCandidate(new RTCIceCandidate(candidate))
   } catch(err) {
     console.log(err.message)
   }
