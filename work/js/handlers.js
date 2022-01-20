@@ -25,7 +25,7 @@ export async function userJoinedHandler(payload) {
 
 function handleICETrickling(event) {
   if (event.candidate) {
-    sendMessage({ ICECandidate: event.candidate })
+    sendMessage(event.candidate)
   }
 }
 
@@ -60,7 +60,7 @@ export async function onAnswer(payload) {
 
 export async function onCandidate(payload) {
   try {
-    await peersMap[localUuid].pc.addIceCandidate(new RTCIceCandidate(payload.ICECandidate))
+    await peersMap[localUuid].pc.addIceCandidate(new RTCIceCandidate(payload))
   } catch(err) {
     console.log(err.message)
   }
