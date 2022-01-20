@@ -13,19 +13,13 @@ export async function userJoinedHandler(payload) {
     localVideo.srcObject = localStream
     
     peersMap[localUuid] = { id: localUuid, pc: new RTCPeerConnection(peerConfig) }
-    peersMap[localUuid].pc.onicecandidate = handleICETrickling
+    peersMap[localUuid].pc.onicecandidate = event => event.candidate ? sendMessage(event.candidate) : null
     peersMap[localUuid].pc.ontrack = event => onRemoteMediaStream(event, undefined)
     localStream.getTracks().forEach(track => peersMap[localUuid].pc.addTrack(track, localStream))
     
     if (numClients) sendMessage({ type: 'call' })
   } catch(err) {
     console.log(err.message)
-  }
-}
-
-function handleICETrickling(event) {
-  if (event.candidate) {
-    sendMessage(event.candidate)
   }
 }
 
