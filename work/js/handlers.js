@@ -1,4 +1,4 @@
-import { onRemoteMediaStream } from "./utils.js"
+import { onRemoteMediaStream, onPeerDisconnect } from "./utils.js"
 
 function sendMessage(payload) {
   const message = JSON.stringify({ room, payload })
@@ -9,6 +9,7 @@ function setupPeer(peerUuid) {
   peersMap[peerUuid] = { id: peerUuid, pc: new RTCPeerConnection(peerConfig) }
   peersMap[peerUuid].pc.onicecandidate = event => event.candidate ? sendMessage({ type: 'candidate', peerUuid: localUuid, candidate: event.candidate }) : null
   peersMap[peerUuid].pc.ontrack = event => onRemoteMediaStream(event, peerUuid)
+  peersMap[peerUuid].pc.oniceconnectionstatechange = event => onPeerDisconnect(event, peerUuid)
   localStream.getTracks().forEach(track => peersMap[peerUuid].pc.addTrack(track, localStream))
 }
 

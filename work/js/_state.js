@@ -5,7 +5,6 @@ var peersMap = {}
 var localUuid
 var localStream
 var localVideo = document.getElementById('localVideo')
-var remoteVideo = document.getElementById('remoteVideo')
 
 var turnReady
 var STUNServers = null
