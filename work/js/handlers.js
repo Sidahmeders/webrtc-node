@@ -27,9 +27,10 @@ export async function onJoined(payload) {
 
 export async function onCall(payload) {
   try {
-    setupPeer(localUuid)
-    const offerDescription = await peersMap[localUuid].pc.createOffer()
-    await peersMap[localUuid].pc.setLocalDescription(new RTCSessionDescription(offerDescription)) 
+    const { peerUuid } = payload
+    setupPeer(peerUuid)
+    const offerDescription = await peersMap[peerUuid].pc.createOffer()
+    await peersMap[peerUuid].pc.setLocalDescription(new RTCSessionDescription(offerDescription)) 
     
     sendMessage({ type: 'offer', peerUuid: localUuid, description: offerDescription })
   } catch(err) {
@@ -39,11 +40,11 @@ export async function onCall(payload) {
 
 export async function onOffer(payload) {
   try {
-    const { description } = payload
-    setupPeer(localUuid)
-    await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
-    const answerDescription = await peersMap[localUuid].pc.createAnswer()
-    await peersMap[localUuid].pc.setLocalDescription(new RTCSessionDescription(answerDescription))
+    const { peerUuid, description } = payload
+    setupPeer(peerUuid)
+    await peersMap[peerUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
+    const answerDescription = await peersMap[peerUuid].pc.createAnswer()
+    await peersMap[peerUuid].pc.setLocalDescription(new RTCSessionDescription(answerDescription))
 
     sendMessage({ type: 'answer', peerUuid: localUuid, description: answerDescription })
   } catch (err) {
@@ -53,8 +54,8 @@ export async function onOffer(payload) {
 
 export async function onAnswer(payload) {
   try {
-    const { description } = payload
-    await peersMap[localUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
+    const { peerUuid, description } = payload
+    await peersMap[peerUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
   } catch(err) {
     console.log(err.message)
   }
@@ -62,8 +63,8 @@ export async function onAnswer(payload) {
 
 export async function onCandidate(payload) {
   try {
-    const { candidate } = payload
-    await peersMap[localUuid].pc.addIceCandidate(new RTCIceCandidate(candidate))
+    const { peerUuid, candidate } = payload
+    await peersMap[peerUuid].pc.addIceCandidate(new RTCIceCandidate(candidate))
   } catch(err) {
     console.log(err.message)
   }
