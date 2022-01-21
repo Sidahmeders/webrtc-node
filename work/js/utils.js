@@ -1,5 +1,5 @@
 
-export function onRemoteMediaStream(event, peerUuid = '9892kdjf') {
+export function onRemoteMediaStream(event, peerUuid) {
   //assign stream to new HTML video element
   const remoteVideosContainer = document.getElementById('videos')
   const vidElement = document.createElement('video')

@@ -41,12 +41,14 @@ export async function onCall(payload) {
 export async function onOffer(payload) {
   try {
     const { peerUuid, description } = payload
-    setupPeer(peerUuid)
-    await peersMap[peerUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
-    const answerDescription = await peersMap[peerUuid].pc.createAnswer()
-    await peersMap[peerUuid].pc.setLocalDescription(new RTCSessionDescription(answerDescription))
+    if (!peersMap[peerUuid]) {
+      setupPeer(peerUuid)
+      await peersMap[peerUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
+      const answerDescription = await peersMap[peerUuid].pc.createAnswer()
+      await peersMap[peerUuid].pc.setLocalDescription(new RTCSessionDescription(answerDescription))
 
-    sendMessage({ type: 'answer', peerUuid: localUuid, description: answerDescription })
+      sendMessage({ type: 'answer', peerUuid: localUuid, destUuid: peerUuid, description: answerDescription })
+    }
   } catch (err) {
     console.log(err.message)
   }
@@ -54,8 +56,10 @@ export async function onOffer(payload) {
 
 export async function onAnswer(payload) {
   try {
-    const { peerUuid, description } = payload
-    await peersMap[peerUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
+    const { peerUuid, destUuid, description } = payload
+    if (destUuid === localUuid) {
+      await peersMap[peerUuid].pc.setRemoteDescription(new RTCSessionDescription(description))
+    }
   } catch(err) {
     console.log(err.message)
   }
